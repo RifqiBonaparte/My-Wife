@@ -127,6 +127,8 @@ Semoga setiap dede buka ini, dede selalu merasa dicintai 💖
   </div>
 
 </div>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
 
 <script>
 let password = "kaka selalu sayang dede";
@@ -213,7 +215,8 @@ function cekTanggal() {
   }
 }
 
-// SIMPAN KOMENTAR
+
+// KIRIM KOMENTAR
 function kirimKomentar() {
   let nama = document.getElementById("nama").value;
   let komentar = document.getElementById("komentar").value;
@@ -223,18 +226,26 @@ function kirimKomentar() {
     return;
   }
 
-  let data = JSON.parse(localStorage.getItem("komentarList")) || [];
-
-  data.push({ nama, komentar });
-
-  localStorage.setItem("komentarList", JSON.stringify(data));
-
-  tampilkanKomentar();
+  db.ref("komentar").push({
+    nama: nama,
+    komentar: komentar
+  });
 
   document.getElementById("nama").value = "";
   document.getElementById("komentar").value = "";
 }
 
+// AMBIL & TAMPILKAN
+db.ref("komentar").on("value", (snapshot) => {
+  let data = snapshot.val();
+  let html = "";
+
+  for (let id in data) {
+    html += `<p><b>${data[id].nama}</b>: ${data[id].komentar}</p>`;
+  }
+
+  document.getElementById("listKomentar").innerHTML = html;
+});
 // TAMPILKAN KOMENTAR
 function tampilkanKomentar() {
   let data = JSON.parse(localStorage.getItem("komentarList")) || [];
@@ -359,6 +370,18 @@ function lihatFoto(src) {
 
   document.body.appendChild(box);
 }
+const firebaseConfig = {
+  apiKey: "AIzaSyCf_wZGW9TrOot5GBEW4EcIo5u7BY4g474",
+  authDomain: "my-wife-one-only.firebaseapp.com",
+  projectId: "my-wife-one-only",
+  storageBucket: "my-wife-one-only.firebasestorage.app",
+  messagingSenderId: "520852731004",
+  appId: "1:520852731004:web:96afc608002d47d83905f9",
+  measurementId: "G-F5J0MZYN3W"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
 </script>
 
 </body>
