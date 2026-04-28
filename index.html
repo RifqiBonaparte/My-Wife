@@ -44,6 +44,20 @@ textarea {
 @keyframes fall {
   to { transform: translateY(100vh); }
 }
+
+#album img {
+  width: 80px;
+  height: 80px;
+  margin: 5px;
+  border-radius: 10px;
+  object-fit: cover;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+#album img:hover {
+  transform: scale(1.2);
+}
 </style>
 
 </head>
@@ -71,16 +85,40 @@ Semoga setiap dede buka ini, dede selalu merasa dicintai 💖
 
   <h1>Untuk Istriku ❤️</h1>
 
+  <div id="countdown" style="font-size:20px; margin-top:10px;"></div>
+
   <!-- FOTO -->
   <img src="karisa.jpg" width="200" style="border-radius:15px;">
 
   <!-- SURAT INPUT -->
   <div class="box">
-    <h3>💌 Tulis Pesan Cinta</h3>
-    <textarea id="loveText" placeholder="Tulis pesan di sini..."></textarea><br>
-    <button onclick="simpan()">Simpan</button>
-    <p id="hasil"></p>
-  </div>
+  <h3>💬 Komentar Kita</h3>
+  
+  <input id="nama" placeholder="Nama"><br><br>
+  <textarea id="komentar" placeholder="Tulis komentar..."></textarea><br>
+  
+  <button onclick="kirimKomentar()">Kirim</button>
+
+  <div id="listKomentar"></div>
+</div>
+<div class="box">
+  <h3>📅 Rencana Kita</h3>
+
+  <input type="text" id="namaAcara" placeholder="Nama acara"><br><br>
+  <input type="date" id="tanggalAcara"><br><br>
+
+  <button onclick="tambahAcara()">Tambah</button>
+
+  <div id="listAcara"></div>
+</div>
+<div class="box">
+  <h3>📸 Album Kita ❤️</h3>
+
+  <input type="file" id="uploadFoto" accept="image/*"><br><br>
+  <button onclick="tambahFoto()">Tambah Foto</button>
+
+  <div id="album" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
+</div>
 
   <!-- KEJUTAN -->
   <div class="box">
@@ -103,6 +141,9 @@ function login() {
     startHearts();
     cekTanggal();
     loadPesan();
+    tampilkanKomentar();
+    tampilkanAcara();
+    tampilkanAlbum();
     document.getElementById("Dahsyat").play();
   } else {
     document.getElementById("msg").innerHTML="Password salah 💔";
@@ -170,6 +211,153 @@ function cekTanggal() {
       surprise();
     }, 2000);
   }
+}
+
+// SIMPAN KOMENTAR
+function kirimKomentar() {
+  let nama = document.getElementById("nama").value;
+  let komentar = document.getElementById("komentar").value;
+
+  if (!nama || !komentar) {
+    alert("Isi dulu ya ❤️");
+    return;
+  }
+
+  let data = JSON.parse(localStorage.getItem("komentarList")) || [];
+
+  data.push({ nama, komentar });
+
+  localStorage.setItem("komentarList", JSON.stringify(data));
+
+  tampilkanKomentar();
+
+  document.getElementById("nama").value = "";
+  document.getElementById("komentar").value = "";
+}
+
+// TAMPILKAN KOMENTAR
+function tampilkanKomentar() {
+  let data = JSON.parse(localStorage.getItem("komentarList")) || [];
+  let html = "";
+
+  data.forEach(item => {
+    html += `<p><b>${item.nama}</b>: ${item.komentar}</p>`;
+  });
+
+  document.getElementById("listKomentar").innerHTML = html;
+}
+
+// TAMBAH ACARA
+function tambahAcara() {
+  let nama = document.getElementById("namaAcara").value;
+  let tanggal = document.getElementById("tanggalAcara").value;
+
+  if (!nama || !tanggal) {
+    alert("Isi dulu ya ❤️");
+    return;
+  }
+
+  let data = JSON.parse(localStorage.getItem("acaraList")) || [];
+  data.push({ nama, tanggal });
+
+  localStorage.setItem("acaraList", JSON.stringify(data));
+
+  tampilkanAcara();
+
+  document.getElementById("namaAcara").value = "";
+  document.getElementById("tanggalAcara").value = "";
+}
+
+// TAMPILKAN ACARA
+function tampilkanAcara() {
+  let data = JSON.parse(localStorage.getItem("acaraList")) || [];
+  let html = "";
+
+  data.forEach(item => {
+    html += `<p>❤️ ${item.nama} - ${item.tanggal}</p>`;
+  });
+
+  document.getElementById("listAcara").innerHTML = html;
+}
+
+function hitungCountdown() {
+  let now = new Date();
+
+  let target = new Date(now.getFullYear(), now.getMonth(), 9);
+
+  // kalau sudah lewat tanggal 9 → ke bulan depan
+  if (now.getDate() > 9) {
+    target = new Date(now.getFullYear(), now.getMonth() + 1, 9);
+  }
+
+  let selisih = target - now;
+
+  let hari = Math.floor(selisih / (1000 * 60 * 60 * 24));
+  let jam = Math.floor((selisih / (1000 * 60 * 60)) % 24);
+  let menit = Math.floor((selisih / (1000 * 60)) % 60);
+
+  document.getElementById("countdown").innerHTML =
+    `💖 Menuju tanggal 9: ${hari} hari ${jam} jam ${menit} menit lagi`;
+}
+
+// update terus
+setInterval(hitungCountdown, 1000);
+
+// TAMBAH FOTO
+function tambahFoto() {
+  let file = document.getElementById("uploadFoto").files[0];
+
+  if (!file) {
+    alert("Pilih foto dulu ❤️");
+    return;
+  }
+
+  let reader = new FileReader();
+
+  reader.onload = function(e) {
+    let data = JSON.parse(localStorage.getItem("albumFoto")) || [];
+
+    data.push(e.target.result); // simpan base64
+
+    localStorage.setItem("albumFoto", JSON.stringify(data));
+
+    tampilkanAlbum();
+  };
+
+  reader.readAsDataURL(file);
+}
+
+// TAMPILKAN FOTO
+function tampilkanAlbum() {
+  let data = JSON.parse(localStorage.getItem("albumFoto")) || [];
+  let html = "";
+
+  data.forEach(foto => {
+    html += `<img src="${foto}" onclick="lihatFoto('${foto}')">`;
+  });
+
+  document.getElementById("album").innerHTML = html;
+}
+
+// LIHAT FOTO BESAR
+function lihatFoto(src) {
+  let box = document.createElement("div");
+
+  box.style.position = "fixed";
+  box.style.top = "0";
+  box.style.left = "0";
+  box.style.width = "100%";
+  box.style.height = "100%";
+  box.style.background = "rgba(0,0,0,0.8)";
+  box.style.display = "flex";
+  box.style.justifyContent = "center";
+  box.style.alignItems = "center";
+
+  box.innerHTML = `<img src="${src}" style="max-width:80%; border-radius:15px;">`;
+
+  box.onclick = () => box.remove();
+
+  document.body.appendChild(box);
 }
 </script>
 
