@@ -49,7 +49,9 @@ textarea {
 </head>
 
 <body>
-
+<audio id="Dahsyat" loop>
+  <source src="Dahsyat.mp3" type="audio/mpeg">
+</audio>
 <!-- LOGIN -->
 <div class="box" id="loginBox">
   <h2>💖 Welcome My Love 💖</h2>
@@ -60,6 +62,12 @@ textarea {
 
 <!-- HALAMAN UTAMA -->
 <div class="hidden" id="home">
+
+  <p>
+Website ini aku buat khusus untuk dede (Karisa Fadlina) ❤️<br>
+Pokoknya simpen aja semua kesedihan, kebahagiaan,dan cinta dede dan kaka disini.<br>
+Semoga setiap dede buka ini, dede selalu merasa dicintai 💖
+</p>
 
   <h1>Untuk Istriku ❤️</h1>
 
@@ -83,7 +91,7 @@ textarea {
 </div>
 
 <script>
-let password = "aku sayang kamu";
+let password = "kaka selalu sayang dede";
 
 // LOGIN
 function login() {
@@ -95,6 +103,7 @@ function login() {
     startHearts();
     cekTanggal();
     loadPesan();
+    document.getElementById("Dahsyat").play();
   } else {
     document.getElementById("msg").innerHTML="Password salah 💔";
   }
@@ -131,13 +140,23 @@ function startHearts() {
 
 // KEJUTAN RANDOM
 function surprise() {
-  let pesan = [
-    "Aku cinta kamu ❤️",
-    "Kamu segalanya buat aku 💖",
-    "Terima kasih sudah hadir di hidupku 🌹",
-    "Aku akan selalu ada untukmu 💕"
-  ];
+  let box = document.createElement("div");
+  box.innerHTML = "💖 KAKA SAYANG DEDE 💖";
+  box.style.position = "fixed";
+  box.style.top = "40%";
+  box.style.left = "50%";
+  box.style.transform = "translate(-50%, -50%)";
+  box.style.background = "white";
+  box.style.padding = "30px";
+  box.style.borderRadius = "20px";
+  box.style.fontSize = "20px";
+  box.style.boxShadow = "0 0 20px pink";
 
+  document.body.appendChild(box);
+
+  setTimeout(() => box.remove(), 3000);
+}
+{
   let random = pesan[Math.floor(Math.random()*pesan.length)];
   alert(random);
 }
@@ -148,7 +167,7 @@ function cekTanggal() {
 
   if (today.getDate() == 9) {
     setTimeout(() => {
-      alert("🎉 Happy Monthly Anniversary ❤️\nAku sayang kamu selalu 💖");
+      surprise();
     }, 2000);
   }
 }
