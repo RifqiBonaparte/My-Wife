@@ -16,7 +16,7 @@ body {
   background: white;
   padding: 20px;
   margin: 20px auto;
-  width: 300px;
+  width: 320px;
   border-radius: 15px;
 }
 
@@ -28,12 +28,16 @@ button {
   border-radius: 10px;
 }
 
+textarea {
+  width: 90%;
+  height: 100px;
+}
+
 .hidden { display:none; }
 
 .heart {
   position: fixed;
   top: -10px;
-  color: red;
   animation: fall 5s linear infinite;
 }
 
@@ -49,7 +53,6 @@ button {
 <!-- LOGIN -->
 <div class="box" id="loginBox">
   <h2>💖 Welcome My Love 💖</h2>
-  <p>Masukkan password untuk masuk</p>
   <input type="password" id="pass" placeholder="Password"><br><br>
   <button onclick="login()">Masuk</button>
   <p id="msg" style="color:red;"></p>
@@ -58,36 +61,31 @@ button {
 <!-- HALAMAN UTAMA -->
 <div class="hidden" id="home">
 
-  <h1>Untuk Istriku Tercinta ❤️</h1>
+  <h1>Untuk Istriku ❤️</h1>
 
   <!-- FOTO -->
   <img src="karisa.jpg" width="200" style="border-radius:15px;">
 
-  <!-- SURAT CINTA -->
+  <!-- SURAT INPUT -->
   <div class="box">
-    <h3>💌 Surat Cinta</h3>
-    <p>
-      Untukmu, Karisa Fadlina ❤️<br><br>
-      Dari aku, Rifqi Saefulloh...<br><br>
-      Terima kasih sudah hadir dalam hidupku.
-      Kamu adalah alasan aku tersenyum setiap hari.
-      Semoga cinta ini selalu tumbuh, hari demi hari 💖
-    </p>
+    <h3>💌 Tulis Pesan Cinta</h3>
+    <textarea id="loveText" placeholder="Tulis pesan di sini..."></textarea><br>
+    <button onclick="simpan()">Simpan</button>
+    <p id="hasil"></p>
   </div>
 
-  <!-- GAME -->
+  <!-- KEJUTAN -->
   <div class="box">
-    <h3>🎮 Mini Game</h3>
-    <p>Klik tombol sampai 10!</p>
-    <button onclick="game()">Klik ❤️</button>
-    <p id="score">0</p>
+    <h3>🎁 Kejutan Untukmu</h3>
+    <button onclick="surprise()">Buka Kejutan ❤️</button>
   </div>
 
 </div>
 
 <script>
-let password = "aku sayang kamu"; // GANTI PASSWORD DI SINI
+let password = "aku sayang kamu";
 
+// LOGIN
 function login() {
   let input = document.getElementById("pass").value;
 
@@ -95,12 +93,29 @@ function login() {
     document.getElementById("loginBox").style.display="none";
     document.getElementById("home").classList.remove("hidden");
     startHearts();
+    cekTanggal();
+    loadPesan();
   } else {
     document.getElementById("msg").innerHTML="Password salah 💔";
   }
 }
 
-// efek hati jatuh
+// SIMPAN PESAN (localStorage)
+function simpan() {
+  let text = document.getElementById("loveText").value;
+  localStorage.setItem("pesanCinta", text);
+  document.getElementById("hasil").innerHTML = "Tersimpan ❤️";
+}
+
+// LOAD PESAN
+function loadPesan() {
+  let text = localStorage.getItem("pesanCinta");
+  if (text) {
+    document.getElementById("loveText").value = text;
+  }
+}
+
+// EFEK HATI
 function startHearts() {
   setInterval(() => {
     let heart = document.createElement("div");
@@ -114,14 +129,27 @@ function startHearts() {
   }, 300);
 }
 
-// mini game
-let count = 0;
-function game() {
-  count++;
-  document.getElementById("score").innerHTML = count;
+// KEJUTAN RANDOM
+function surprise() {
+  let pesan = [
+    "Aku cinta kamu ❤️",
+    "Kamu segalanya buat aku 💖",
+    "Terima kasih sudah hadir di hidupku 🌹",
+    "Aku akan selalu ada untukmu 💕"
+  ];
 
-  if (count == 10) {
-    alert("Aku cinta kamu ❤️");
+  let random = pesan[Math.floor(Math.random()*pesan.length)];
+  alert(random);
+}
+
+// KEJUTAN TANGGAL 9
+function cekTanggal() {
+  let today = new Date();
+
+  if (today.getDate() == 9) {
+    setTimeout(() => {
+      alert("🎉 Happy Monthly Anniversary ❤️\nAku sayang kamu selalu 💖");
+    }, 2000);
   }
 }
 </script>
