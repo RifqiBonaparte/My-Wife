@@ -38,10 +38,6 @@ button {
 #main {
   display: none;
 }
-
-#areaGame div {
-  transition: 0.2s;
-}
 </style>
 </head>
 
@@ -50,10 +46,10 @@ button {
 <!-- LOGIN -->
 <div id="loginBox" class="box">
   <h2>💖 Selamat Datang Dede 💖</h2>
-  <p>Masukkan kata rahasia dari kaka</p>
-  <input type="password" id="password" placeholder="kata rahasia">
-  <br>
-  <button onclick="login()">Masuk</button>
+  <input id="email" placeholder="Email"><br>
+  <input id="passwordLogin" type="password" placeholder="Password"><br>
+  <button onclick="daftar()">Daftar</button>
+  <button onclick="masuk()">Masuk</button>
 </div>
 
 <!-- MAIN -->
@@ -78,7 +74,6 @@ button {
 <!-- KOMENTAR -->
 <div class="box">
   <h3>💬 Cerita Kita</h3>
-  <input id="nama" placeholder="Nama">
   <textarea id="komentar" placeholder="Tulis sesuatu untuk dede..."></textarea>
   <br>
   <button onclick="kirimKomentar()">Kirim</button>
@@ -97,7 +92,6 @@ button {
 <!-- LEADERBOARD -->
 <div class="box">
   <h3>🏆 Leaderboard Cinta</h3>
-  <input id="namaPlayer" placeholder="Nama">
   <button onclick="simpanSkor()">Simpan Skor</button>
   <div id="leaderboard"></div>
 </div>
@@ -107,48 +101,75 @@ button {
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
 <script>
-// 🔑 GANTI DENGAN CONFIG KAMU
-const firebaseConfig = {
-  apiKey: "AIzaSyCf_wZGW9TrOot5GBEW4EcIo5u7BY4g474",
-  authDomain: "my-wife-one-only.firebaseapp.com",
-  databaseURL: "https://my-wife-one-only-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "my-wife-one-only",
-  storageBucket: "my-wife-one-only.firebasestorage.app",
-  messagingSenderId: "520852731004",
-  appId: "1:520852731004:web:96afc608002d47d83905f9",
-  measurementId: "G-F5J0MZYN3W"
-};
 
+// 🔥 CONFIG
+const firebaseConfig = { apiKey: "AIzaSyCf_wZGW9TrOot5GBEW4EcIo5u7BY4g474", authDomain: "my-wife-one-only.firebaseapp.com", databaseURL: "https://my-wife-one-only-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "my-wife-one-only", storageBucket: "my-wife-one-only.firebasestorage.app", messagingSenderId: "520852731004", appId: "1:520852731004:web:96afc608002d47d83905f9", measurementId: "G-F5J0MZYN3W" };
 firebase.initializeApp(firebaseConfig);
+
 const db = firebase.database();
+const auth = firebase.auth();
+
+// DAFTAR
+function daftar() {
+  let email = document.getElementById("email").value;
+  let pass = document.getElementById("passwordLogin").value;
+
+  auth.createUserWithEmailAndPassword(email, pass)
+    .then(() => alert("Berhasil daftar ❤️"))
+    .catch(err => alert(err.message));
+}
 
 // LOGIN
-function login() {
-  let pass = document.getElementById("password").value;
-  if (pass === "kaka sayang dede") {
+function masuk() {
+  let email = document.getElementById("email").value;
+  let pass = document.getElementById("passwordLogin").value;
+
+  auth.signInWithEmailAndPassword(email, pass)
+    .catch(err => alert(err.message));
+}
+
+// AUTO LOGIN + SIMPAN NAMA
+auth.onAuthStateChanged(user => {
+  if (user) {
+    let uid = user.uid;
+
+    db.ref("users/" + uid).once("value", snap => {
+      if (!snap.exists()) {
+        let nama = prompt("Masukkan nama kamu ❤️");
+        db.ref("users/" + uid).set({
+          nama: nama
+        });
+      }
+    });
+
     document.getElementById("loginBox").style.display = "none";
     document.getElementById("main").style.display = "block";
-  } else {
-    alert("Salah ya dede ❤️");
   }
-}
+});
 
 // KOMENTAR
 function kirimKomentar() {
-  let nama = document.getElementById("nama").value;
+  let user = auth.currentUser;
   let komentar = document.getElementById("komentar").value;
 
-  if (!nama || !komentar) return alert("Isi dulu ya dede ❤️");
+  if (!user) return alert("Login dulu ❤️");
 
-  db.ref("komentar").push({
-    nama: nama,
-    komentar: komentar
+  let uid = user.uid;
+
+  db.ref("users/" + uid).once("value", snap => {
+    let nama = snap.val().nama;
+
+    db.ref("komentar").push({
+      nama: nama,
+      komentar: komentar
+    });
   });
 }
 
-db.ref("komentar").on("value", (snapshot) => {
+db.ref("komentar").on("value", snapshot => {
   let data = snapshot.val();
   let html = "";
 
@@ -215,17 +236,22 @@ function spawnHati() {
 
 // LEADERBOARD
 function simpanSkor() {
-  let nama = document.getElementById("namaPlayer").value;
+  let user = auth.currentUser;
+  if (!user) return alert("Login dulu ❤️");
 
-  if (!nama) return alert("Isi nama ya ❤️");
+  let uid = user.uid;
 
-  db.ref("leaderboard").push({
-    nama: nama,
-    skor: skor
+  db.ref("users/" + uid).once("value", snap => {
+    let nama = snap.val().nama;
+
+    db.ref("leaderboard/" + uid).set({
+      nama: nama,
+      skor: skor
+    });
   });
 }
 
-db.ref("leaderboard").on("value", (snapshot) => {
+db.ref("leaderboard").on("value", snapshot => {
   let data = snapshot.val();
   let arr = [];
 
@@ -233,15 +259,16 @@ db.ref("leaderboard").on("value", (snapshot) => {
     arr.push(data[id]);
   }
 
-  arr.sort((a, b) => b.skor - a.skor);
+  arr.sort((a,b)=>b.skor-a.skor);
 
   let html = "";
-  arr.forEach((item, i) => {
+  arr.forEach((item,i)=>{
     html += `<p>${i+1}. ❤️ ${item.nama} - ${item.skor}</p>`;
   });
 
   document.getElementById("leaderboard").innerHTML = html;
 });
+
 </script>
 
 </body>
