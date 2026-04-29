@@ -2,240 +2,152 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>My Wife ❤️</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Untuk Dede 💖</title>
 
 <style>
 body {
-  font-family: Arial;
-  text-align: center;
-  background: linear-gradient(#ff9a9e, #fad0c4);
   margin: 0;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+  color: #fff;
 }
 
 .box {
-  background: white;
-  padding: 20px;
-  margin: 20px auto;
-  width: 320px;
+  background: rgba(255,255,255,0.2);
+  margin: 15px;
+  padding: 15px;
   border-radius: 15px;
 }
 
-button {
+input, textarea, button {
   padding: 10px;
+  border-radius: 10px;
   border: none;
-  background: pink;
-  cursor: pointer;
-  border-radius: 10px;
-}
-
-textarea {
-  width: 90%;
-  height: 100px;
-}
-
-.hidden { display:none; }
-
-.heart {
-  position: fixed;
-  top: -10px;
-  animation: fall 5s linear infinite;
-}
-
-@keyframes fall {
-  to { transform: translateY(100vh); }
-}
-
-#album img {
-  width: 80px;
-  height: 80px;
+  width: 80%;
   margin: 5px;
-  border-radius: 10px;
-  object-fit: cover;
-  transition: 0.3s;
+}
+
+button {
+  background: #ff4d6d;
+  color: white;
   cursor: pointer;
 }
 
-#album img:hover {
-  transform: scale(1.2);
+#main {
+  display: none;
+}
+
+#areaGame div {
+  transition: 0.2s;
 }
 </style>
-
 </head>
 
 <body>
-<audio id="Dahsyat" loop>
+
+<!-- LOGIN -->
+<div id="loginBox" class="box">
+  <h2>💖 Selamat Datang Dede 💖</h2>
+  <p>Masukkan kata rahasia dari kaka</p>
+  <input type="password" id="password" placeholder="kata rahasia">
+  <br>
+  <button onclick="login()">Masuk</button>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+<div class="box">
+  <h2>💌 Untuk Dede Tercinta</h2>
+  <p>
+    Hai dede...  
+    Website ini dibuat khusus oleh kaka untuk dede.  
+    Semoga setiap bagian di sini bisa bikin dede senyum 😊  
+    Kaka sayang sama dede selamanya 💖
+  </p>
+</div>
+
+<!-- MUSIK -->
+<audio id="music" loop>
   <source src="Dahsyat.mp3" type="audio/mpeg">
 </audio>
-<!-- LOGIN -->
-<div class="box" id="loginBox">
-  <h2>💖 Welcome My Love 💖</h2>
-  <input type="password" id="pass" placeholder="Password"><br><br>
-  <button onclick="login()">Masuk</button>
-  <p id="msg" style="color:red;"></p>
-</div>
+<button onclick="document.getElementById('music').play()">▶️ Putar Musik</button>
 
-<!-- HALAMAN UTAMA -->
-<div class="hidden" id="home">
-
-  <p>
-Website ini aku buat khusus untuk dede (Karisa Fadlina) ❤️<br>
-Pokoknya simpen aja semua kesedihan, kebahagiaan,dan cinta dede dan kaka disini.<br>
-Semoga setiap dede buka ini, dede selalu merasa dicintai 💖
-</p>
-
-  <h1>Untuk Istriku ❤️</h1>
-
-  <div id="countdown" style="font-size:20px; margin-top:10px;"></div>
-
-  <!-- FOTO -->
-  <img src="karisa.jpg" width="200" style="border-radius:15px;">
-
-  <!-- SURAT INPUT -->
-  <div class="box">
-  <h3>💬 Komentar Kita</h3>
-  
-  <input id="nama" placeholder="Nama"><br><br>
-  <textarea id="komentar" placeholder="Tulis komentar..."></textarea><br>
-  
+<!-- KOMENTAR -->
+<div class="box">
+  <h3>💬 Cerita Kita</h3>
+  <input id="nama" placeholder="Nama">
+  <textarea id="komentar" placeholder="Tulis sesuatu untuk dede..."></textarea>
+  <br>
   <button onclick="kirimKomentar()">Kirim</button>
-
   <div id="listKomentar"></div>
 </div>
+
+<!-- GAME -->
 <div class="box">
-  <h3>📅 Rencana Kita</h3>
-
-  <input type="text" id="namaAcara" placeholder="Nama acara"><br><br>
-  <input type="date" id="tanggalAcara"><br><br>
-
-  <button onclick="tambahAcara()">Tambah</button>
-
-  <div id="listAcara"></div>
+  <h3>💗 Tangkap Hati Dede</h3>
+  <p>Waktu: <span id="timer">10</span></p>
+  <p>Skor: <span id="score">0</span></p>
+  <button onclick="mulaiGame()">Mulai Game</button>
+  <div id="areaGame" style="height:200px; position:relative;"></div>
 </div>
+
+<!-- LEADERBOARD -->
 <div class="box">
-  <h3>📸 Album Kita ❤️</h3>
-
-  <input type="file" id="uploadFoto" accept="image/*"><br><br>
-  <button onclick="tambahFoto()">Tambah Foto</button>
-
-  <div id="album" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
+  <h3>🏆 Leaderboard Cinta</h3>
+  <input id="namaPlayer" placeholder="Nama">
+  <button onclick="simpanSkor()">Simpan Skor</button>
+  <div id="leaderboard"></div>
 </div>
 
-  <!-- KEJUTAN -->
-  <div class="box">
-    <h3>🎁 Kejutan Untukmu</h3>
-    <button onclick="surprise()">Buka Kejutan ❤️</button>
-  </div>
-
 </div>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
 <script>
-let password = "kaka selalu sayang dede";
+// 🔑 GANTI DENGAN CONFIG KAMU
+const firebaseConfig = {
+  apiKey: "AIzaSyCf_wZGW9TrOot5GBEW4EcIo5u7BY4g474",
+  authDomain: "my-wife-one-only.firebaseapp.com",
+  databaseURL: "https://my-wife-one-only-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "my-wife-one-only",
+  storageBucket: "my-wife-one-only.firebasestorage.app",
+  messagingSenderId: "520852731004",
+  appId: "1:520852731004:web:96afc608002d47d83905f9",
+  measurementId: "G-F5J0MZYN3W"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
 // LOGIN
 function login() {
-  let input = document.getElementById("pass").value;
-
-  if (input === password) {
-    document.getElementById("loginBox").style.display="none";
-    document.getElementById("home").classList.remove("hidden");
-    startHearts();
-    cekTanggal();
-    loadPesan();
-    tampilkanKomentar();
-    tampilkanAcara();
-    tampilkanAlbum();
-    document.getElementById("Dahsyat").play();
+  let pass = document.getElementById("password").value;
+  if (pass === "kaka sayang dede") {
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("main").style.display = "block";
   } else {
-    document.getElementById("msg").innerHTML="Password salah 💔";
+    alert("Salah ya dede ❤️");
   }
 }
 
-// SIMPAN PESAN (localStorage)
-function simpan() {
-  let text = document.getElementById("loveText").value;
-  localStorage.setItem("pesanCinta", text);
-  document.getElementById("hasil").innerHTML = "Tersimpan ❤️";
-}
-
-// LOAD PESAN
-function loadPesan() {
-  let text = localStorage.getItem("pesanCinta");
-  if (text) {
-    document.getElementById("loveText").value = text;
-  }
-}
-
-// EFEK HATI
-function startHearts() {
-  setInterval(() => {
-    let heart = document.createElement("div");
-    heart.className = "heart";
-    heart.innerHTML = "❤️";
-    heart.style.left = Math.random()*100 + "vw";
-    heart.style.fontSize = (10 + Math.random()*20) + "px";
-    document.body.appendChild(heart);
-
-    setTimeout(() => heart.remove(), 5000);
-  }, 300);
-}
-
-// KEJUTAN RANDOM
-function surprise() {
-  let box = document.createElement("div");
-  box.innerHTML = "💖 KAKA SAYANG DEDE 💖";
-  box.style.position = "fixed";
-  box.style.top = "40%";
-  box.style.left = "50%";
-  box.style.transform = "translate(-50%, -50%)";
-  box.style.background = "white";
-  box.style.padding = "30px";
-  box.style.borderRadius = "20px";
-  box.style.fontSize = "20px";
-  box.style.boxShadow = "0 0 20px pink";
-
-  document.body.appendChild(box);
-
-  setTimeout(() => box.remove(), 3000);
-}
-{
-  let random = pesan[Math.floor(Math.random()*pesan.length)];
-  alert(random);
-}
-
-// KEJUTAN TANGGAL 9
-function cekTanggal() {
-  let today = new Date();
-
-  if (today.getDate() == 9) {
-    setTimeout(() => {
-      surprise();
-    }, 2000);
-  }
-}
-
-
-// KIRIM KOMENTAR
+// KOMENTAR
 function kirimKomentar() {
   let nama = document.getElementById("nama").value;
   let komentar = document.getElementById("komentar").value;
 
-  if (!nama || !komentar) {
-    alert("Isi dulu ya ❤️");
-    return;
-  }
+  if (!nama || !komentar) return alert("Isi dulu ya dede ❤️");
 
   db.ref("komentar").push({
     nama: nama,
     komentar: komentar
   });
-
-  document.getElementById("nama").value = "";
-  document.getElementById("komentar").value = "";
 }
 
-// AMBIL & TAMPILKAN
 db.ref("komentar").on("value", (snapshot) => {
   let data = snapshot.val();
   let html = "";
@@ -246,142 +158,90 @@ db.ref("komentar").on("value", (snapshot) => {
 
   document.getElementById("listKomentar").innerHTML = html;
 });
-// TAMPILKAN KOMENTAR
-function tampilkanKomentar() {
-  let data = JSON.parse(localStorage.getItem("komentarList")) || [];
-  let html = "";
 
-  data.forEach(item => {
-    html += `<p><b>${item.nama}</b>: ${item.komentar}</p>`;
-  });
+// GAME
+let skor = 0;
+let waktu = 10;
+let gameAktif = false;
 
-  document.getElementById("listKomentar").innerHTML = html;
+function mulaiGame() {
+  skor = 0;
+  waktu = 10;
+  gameAktif = true;
+
+  document.getElementById("score").innerText = skor;
+  document.getElementById("timer").innerText = waktu;
+
+  spawnHati();
+
+  let countdown = setInterval(() => {
+    waktu--;
+    document.getElementById("timer").innerText = waktu;
+
+    if (waktu <= 0) {
+      clearInterval(countdown);
+      gameAktif = false;
+      alert("Skor kaka: " + skor);
+    }
+  }, 1000);
 }
 
-// TAMBAH ACARA
-function tambahAcara() {
-  let nama = document.getElementById("namaAcara").value;
-  let tanggal = document.getElementById("tanggalAcara").value;
+function spawnHati() {
+  if (!gameAktif) return;
 
-  if (!nama || !tanggal) {
-    alert("Isi dulu ya ❤️");
-    return;
-  }
+  let area = document.getElementById("areaGame");
 
-  let data = JSON.parse(localStorage.getItem("acaraList")) || [];
-  data.push({ nama, tanggal });
+  let hati = document.createElement("div");
+  hati.innerHTML = "💖";
 
-  localStorage.setItem("acaraList", JSON.stringify(data));
+  hati.style.position = "absolute";
+  hati.style.left = Math.random() * 90 + "%";
+  hati.style.top = Math.random() * 80 + "%";
+  hati.style.fontSize = "30px";
 
-  tampilkanAcara();
-
-  document.getElementById("namaAcara").value = "";
-  document.getElementById("tanggalAcara").value = "";
-}
-
-// TAMPILKAN ACARA
-function tampilkanAcara() {
-  let data = JSON.parse(localStorage.getItem("acaraList")) || [];
-  let html = "";
-
-  data.forEach(item => {
-    html += `<p>❤️ ${item.nama} - ${item.tanggal}</p>`;
-  });
-
-  document.getElementById("listAcara").innerHTML = html;
-}
-
-function hitungCountdown() {
-  let now = new Date();
-
-  let target = new Date(now.getFullYear(), now.getMonth(), 9);
-
-  // kalau sudah lewat tanggal 9 → ke bulan depan
-  if (now.getDate() > 9) {
-    target = new Date(now.getFullYear(), now.getMonth() + 1, 9);
-  }
-
-  let selisih = target - now;
-
-  let hari = Math.floor(selisih / (1000 * 60 * 60 * 24));
-  let jam = Math.floor((selisih / (1000 * 60 * 60)) % 24);
-  let menit = Math.floor((selisih / (1000 * 60)) % 60);
-
-  document.getElementById("countdown").innerHTML =
-    `💖 Menuju tanggal 9: ${hari} hari ${jam} jam ${menit} menit lagi`;
-}
-
-// update terus
-setInterval(hitungCountdown, 1000);
-
-// TAMBAH FOTO
-function tambahFoto() {
-  let file = document.getElementById("uploadFoto").files[0];
-
-  if (!file) {
-    alert("Pilih foto dulu ❤️");
-    return;
-  }
-
-  let reader = new FileReader();
-
-  reader.onload = function(e) {
-    let data = JSON.parse(localStorage.getItem("albumFoto")) || [];
-
-    data.push(e.target.result); // simpan base64
-
-    localStorage.setItem("albumFoto", JSON.stringify(data));
-
-    tampilkanAlbum();
+  hati.onclick = function() {
+    skor++;
+    document.getElementById("score").innerText = skor;
+    hati.remove();
   };
 
-  reader.readAsDataURL(file);
+  area.appendChild(hati);
+
+  setTimeout(() => {
+    hati.remove();
+    spawnHati();
+  }, 800);
 }
 
-// TAMPILKAN FOTO
-function tampilkanAlbum() {
-  let data = JSON.parse(localStorage.getItem("albumFoto")) || [];
-  let html = "";
+// LEADERBOARD
+function simpanSkor() {
+  let nama = document.getElementById("namaPlayer").value;
 
-  data.forEach(foto => {
-    html += `<img src="${foto}" onclick="lihatFoto('${foto}')">`;
+  if (!nama) return alert("Isi nama ya ❤️");
+
+  db.ref("leaderboard").push({
+    nama: nama,
+    skor: skor
+  });
+}
+
+db.ref("leaderboard").on("value", (snapshot) => {
+  let data = snapshot.val();
+  let arr = [];
+
+  for (let id in data) {
+    arr.push(data[id]);
+  }
+
+  arr.sort((a, b) => b.skor - a.skor);
+
+  let html = "";
+  arr.forEach((item, i) => {
+    html += `<p>${i+1}. ❤️ ${item.nama} - ${item.skor}</p>`;
   });
 
-  document.getElementById("album").innerHTML = html;
-}
-
-// LIHAT FOTO BESAR
-function lihatFoto(src) {
-  let box = document.createElement("div");
-
-  box.style.position = "fixed";
-  box.style.top = "0";
-  box.style.left = "0";
-  box.style.width = "100%";
-  box.style.height = "100%";
-  box.style.background = "rgba(0,0,0,0.8)";
-  box.style.display = "flex";
-  box.style.justifyContent = "center";
-  box.style.alignItems = "center";
-
-  box.innerHTML = `<img src="${src}" style="max-width:80%; border-radius:15px;">`;
-
-  box.onclick = () => box.remove();
-
-  document.body.appendChild(box);
-}
-const firebaseConfig = {
-  apiKey: "AIzaSyCf_wZGW9TrOot5GBEW4EcIo5u7BY4g474",
-  authDomain: "my-wife-one-only.firebaseapp.com",
-  projectId: "my-wife-one-only",
-  storageBucket: "my-wife-one-only.firebasestorage.app",
-  messagingSenderId: "520852731004",
-  appId: "1:520852731004:web:96afc608002d47d83905f9",
-  measurementId: "G-F5J0MZYN3W"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
+  document.getElementById("leaderboard").innerHTML = html;
+});
 </script>
 
 </body>
