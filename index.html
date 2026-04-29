@@ -45,9 +45,11 @@ button {
 
 <!-- LOGIN -->
 <div id="loginBox" class="box">
-  <h2>💖 Selamat Datang Dede 💖</h2>
+  <h2>💖 Login Dulu Ya Dede 💖</h2>
+
   <input id="email" placeholder="Email"><br>
   <input id="passwordLogin" type="password" placeholder="Password"><br>
+
   <button onclick="daftar()">Daftar</button>
   <button onclick="masuk()">Masuk</button>
 </div>
@@ -57,12 +59,7 @@ button {
 
 <div class="box">
   <h2>💌 Untuk Dede Tercinta</h2>
-  <p>
-    Hai dede...  
-    Website ini dibuat khusus oleh kaka untuk dede.  
-    Semoga setiap bagian di sini bisa bikin dede senyum 😊  
-    Kaka sayang sama dede selamanya 💖
-  </p>
+  <p id="welcomeText"></p>
 </div>
 
 <!-- MUSIK -->
@@ -105,8 +102,9 @@ button {
 
 <script>
 
-// 🔥 CONFIG
+// 🔥 CONFIG (ISI PUNYA KAMU)
 const firebaseConfig = { apiKey: "AIzaSyCf_wZGW9TrOot5GBEW4EcIo5u7BY4g474", authDomain: "my-wife-one-only.firebaseapp.com", databaseURL: "https://my-wife-one-only-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "my-wife-one-only", storageBucket: "my-wife-one-only.firebasestorage.app", messagingSenderId: "520852731004", appId: "1:520852731004:web:96afc608002d47d83905f9", measurementId: "G-F5J0MZYN3W" };
+
 firebase.initializeApp(firebaseConfig);
 
 const db = firebase.database();
@@ -116,6 +114,8 @@ const auth = firebase.auth();
 function daftar() {
   let email = document.getElementById("email").value;
   let pass = document.getElementById("passwordLogin").value;
+
+  if (!email || !pass) return alert("Isi semua dulu ❤️");
 
   auth.createUserWithEmailAndPassword(email, pass)
     .then(() => alert("Berhasil daftar ❤️"))
@@ -131,7 +131,7 @@ function masuk() {
     .catch(err => alert(err.message));
 }
 
-// AUTO LOGIN + SIMPAN NAMA
+// AUTO LOGIN + SIMPAN NAMA SEKALI
 auth.onAuthStateChanged(user => {
   if (user) {
     let uid = user.uid;
@@ -139,10 +139,14 @@ auth.onAuthStateChanged(user => {
     db.ref("users/" + uid).once("value", snap => {
       if (!snap.exists()) {
         let nama = prompt("Masukkan nama kamu ❤️");
+        if (!nama) nama = "Dede 💖";
+
         db.ref("users/" + uid).set({
           nama: nama
         });
       }
+
+      tampilkanUser(uid);
     });
 
     document.getElementById("loginBox").style.display = "none";
@@ -150,12 +154,23 @@ auth.onAuthStateChanged(user => {
   }
 });
 
+// TAMPILKAN USER
+function tampilkanUser(uid) {
+  db.ref("users/" + uid).once("value", snap => {
+    let nama = snap.val().nama;
+
+    document.getElementById("welcomeText").innerHTML =
+      `Hai ${nama}... 💖<br>Kaka sayang sama dede selamanya 😊`;
+  });
+}
+
 // KOMENTAR
 function kirimKomentar() {
   let user = auth.currentUser;
   let komentar = document.getElementById("komentar").value;
 
   if (!user) return alert("Login dulu ❤️");
+  if (!komentar) return alert("Tulis dulu ya ❤️");
 
   let uid = user.uid;
 
@@ -163,12 +178,16 @@ function kirimKomentar() {
     let nama = snap.val().nama;
 
     db.ref("komentar").push({
+      uid: uid,
       nama: nama,
       komentar: komentar
     });
+
+    document.getElementById("komentar").value = "";
   });
 }
 
+// LOAD KOMENTAR
 db.ref("komentar").on("value", snapshot => {
   let data = snapshot.val();
   let html = "";
@@ -251,6 +270,7 @@ function simpanSkor() {
   });
 }
 
+// LOAD LEADERBOARD
 db.ref("leaderboard").on("value", snapshot => {
   let data = snapshot.val();
   let arr = [];
