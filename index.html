@@ -6,6 +6,10 @@
 <title>Untuk Dede 💖</title>
 
 <style>
+
+
+
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -119,6 +123,12 @@ setInterval(() => {
 
 <!-- MAIN -->
 <div id="main">
+
+<!-- COUNTDOWN -->
+<div class="box">
+  <h3>💖 Menuju Hari Kita 💖</h3>
+  <p id="countdownText">Menghitung...</p>
+</div>
 
 <!-- PROFIL -->
 <div class="box profile-box">
@@ -316,7 +326,110 @@ db.ref("leaderboard").on("value",snap=>{
   leaderboard.innerHTML=html;
 });
 
-</script>
+// =======================
+// 🎁 SURPRISE TANGGAL 9
+// =======================
+function cekSurprise() {
+  let today = new Date();
+  if (today.getDate() === 9) {
+    document.getElementById("surpriseBox").style.display = "flex";
+    efekLoveSpesial();
+  }
+}
 
+function tutupSurprise() {
+  document.getElementById("surpriseBox").style.display = "none";
+}
+
+function efekLoveSpesial() {
+  for (let i = 0; i < 25; i++) {
+    let love = document.createElement("div");
+    love.innerHTML = "💖";
+    love.style.position = "fixed";
+    love.style.left = Math.random()*100 + "%";
+    love.style.top = Math.random()*100 + "%";
+    love.style.fontSize = "30px";
+    love.style.animation = "fall 3s linear";
+    document.body.appendChild(love);
+    setTimeout(()=>love.remove(),3000);
+  }
+}
+
+// =======================
+// ⏳ COUNTDOWN KE TANGGAL 9
+// =======================
+function updateCountdown() {
+  let now = new Date();
+  let target = new Date();
+
+  // set ke tanggal 9 bulan ini
+  target.setDate(9);
+  target.setHours(0,0,0,0);
+
+  // kalau sudah lewat → bulan depan
+  if (now.getDate() > 9) {
+    target.setMonth(target.getMonth() + 1);
+  }
+
+  let diff = target - now;
+
+  let hari = Math.floor(diff / (1000*60*60*24));
+  let jam = Math.floor((diff / (1000*60*60)) % 24);
+  let menit = Math.floor((diff / (1000*60)) % 60);
+  let detik = Math.floor((diff / 1000) % 60);
+
+  document.getElementById("countdownText").innerHTML =
+    `💌 ${hari} hari ${jam} jam ${menit} menit ${detik} detik lagi 💖`;
+}
+
+// jalan terus
+setInterval(updateCountdown, 1000);
+
+// jalankan sekali saat load
+updateCountdown();
+cekSurprise();
+
+</script>
+<!-- SURPRISE -->
+<div id="surpriseBox" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
+z-index:999;
+">
+
+  <div style="
+  background:white;
+  color:black;
+  padding:20px;
+  border-radius:20px;
+  width:80%;
+  max-width:300px;
+  text-align:center;
+  animation: popup 0.5s;
+  ">
+    <h2>💖 Happy Monthly 💖</h2>
+    <p>
+      Hai dede... 💕<br>
+      Hari ini tanggal 9 😳<br>
+      Hari spesial kita 💖<br><br>
+      Kaka sayang sama dede selamanya 💕
+    </p>
+    <button onclick="tutupSurprise()">Tutup</button>
+  </div>
+</div>
+
+<style>
+@keyframes popup {
+  from {transform: scale(0);}
+  to {transform: scale(1);}
+}
+</style>
 </body>
 </html>
