@@ -10,15 +10,23 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   text-align: center;
-  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+  background: linear-gradient(135deg, #ff758c, #ff7eb3, #fad0c4);
+  background-size: 400% 400%;
+  animation: bgAnim 10s infinite alternate;
   color: #fff;
+}
+
+@keyframes bgAnim {
+  0% {background-position: left;}
+  100% {background-position: right;}
 }
 
 .box {
   background: rgba(255,255,255,0.2);
   margin: 15px;
   padding: 15px;
-  border-radius: 15px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
 }
 
 input, textarea, button {
@@ -35,27 +43,90 @@ button {
   cursor: pointer;
 }
 
-#main {
-  display: none;
+/* CHAT */
+.chat {
+  display: flex;
+  flex-direction: column;
 }
+
+.bubble {
+  max-width: 70%;
+  padding: 10px;
+  margin: 5px;
+  border-radius: 15px;
+  text-align: left;
+}
+
+.me {
+  background: #ff4d6d;
+  align-self: flex-end;
+}
+
+.other {
+  background: rgba(255,255,255,0.5);
+  color: #000;
+}
+
+/* PROFILE */
+.profile-box {
+  text-align: left;
+}
+
+.profile-box input, .profile-box textarea {
+  width: 95%;
+}
+
+/* LOVE */
+.love {
+  position: fixed;
+  top: -10px;
+  font-size: 20px;
+  animation: fall linear infinite;
+}
+
+@keyframes fall {
+  to { transform: translateY(100vh); }
+}
+
+#main { display: none; }
+
 </style>
 </head>
 
 <body>
 
+<!-- LOVE EFFECT -->
+<script>
+setInterval(() => {
+  let love = document.createElement("div");
+  love.innerHTML = "💖";
+  love.className = "love";
+  love.style.left = Math.random()*100 + "%";
+  love.style.animationDuration = (3 + Math.random()*3) + "s";
+  document.body.appendChild(love);
+  setTimeout(()=>love.remove(),5000);
+},500);
+</script>
+
 <!-- LOGIN -->
 <div id="loginBox" class="box">
   <h2>💖 Login Dulu Ya Dede 💖</h2>
-
   <input id="email" placeholder="Email"><br>
   <input id="passwordLogin" type="password" placeholder="Password"><br>
-
   <button onclick="daftar()">Daftar</button>
   <button onclick="masuk()">Masuk</button>
 </div>
 
 <!-- MAIN -->
 <div id="main">
+
+<!-- PROFIL -->
+<div class="box profile-box">
+  <h3>👤 Profil Dede</h3>
+  <input id="namaProfil" placeholder="Nama"><br>
+  <textarea id="bioProfil" placeholder="Tulis tentang dede..."></textarea><br>
+  <button onclick="simpanProfil()">💾 Simpan Profil</button>
+</div>
 
 <div class="box">
   <h2>💌 Untuk Dede Tercinta</h2>
@@ -72,9 +143,8 @@ button {
 <div class="box">
   <h3>💬 Cerita Kita</h3>
   <textarea id="komentar" placeholder="Tulis sesuatu untuk dede..."></textarea>
-  <br>
   <button onclick="kirimKomentar()">Kirim</button>
-  <div id="listKomentar"></div>
+  <div id="listKomentar" class="chat"></div>
 </div>
 
 <!-- GAME -->
@@ -102,8 +172,7 @@ button {
 
 <script>
 
-// 🔥 CONFIG (ISI PUNYA KAMU)
-const firebaseConfig = { apiKey: "AIzaSyCf_wZGW9TrOot5GBEW4EcIo5u7BY4g474", authDomain: "my-wife-one-only.firebaseapp.com", databaseURL: "https://my-wife-one-only-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "my-wife-one-only", storageBucket: "my-wife-one-only.firebasestorage.app", messagingSenderId: "520852731004", appId: "1:520852731004:web:96afc608002d47d83905f9", measurementId: "G-F5J0MZYN3W" };
+const firebaseConfig = { apiKey: "AIzaSyCf_wZGW9TrOot5GBEW4EcIo5u7BY4g474", authDomain: "my-wife-one-only.firebaseapp.com", databaseURL: "https://my-wife-one-only-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "my-wife-one-only", storageBucket: "my-wife-one-only.firebasestorage.app", messagingSenderId: "520852731004", appId: "1:520852731004:web:96afc608002d47d83905f9" };
 
 firebase.initializeApp(firebaseConfig);
 
@@ -111,182 +180,140 @@ const db = firebase.database();
 const auth = firebase.auth();
 
 // DAFTAR
-function daftar() {
-  let email = document.getElementById("email").value;
-  let pass = document.getElementById("passwordLogin").value;
-
-  if (!email || !pass) return alert("Isi semua dulu ❤️");
-
-  auth.createUserWithEmailAndPassword(email, pass)
-    .then(() => alert("Berhasil daftar ❤️"))
-    .catch(err => alert(err.message));
+function daftar(){
+  auth.createUserWithEmailAndPassword(email.value, passwordLogin.value)
+  .then(()=>alert("Berhasil daftar ❤️"))
+  .catch(err=>alert(err.message));
 }
 
 // LOGIN
-function masuk() {
-  let email = document.getElementById("email").value;
-  let pass = document.getElementById("passwordLogin").value;
-
-  auth.signInWithEmailAndPassword(email, pass)
-    .catch(err => alert(err.message));
+function masuk(){
+  auth.signInWithEmailAndPassword(email.value, passwordLogin.value)
+  .catch(err=>alert(err.message));
 }
 
-// AUTO LOGIN + SIMPAN NAMA SEKALI
-auth.onAuthStateChanged(user => {
-  if (user) {
-    let uid = user.uid;
+// AUTO LOGIN
+auth.onAuthStateChanged(user=>{
+  if(user){
+    let uid=user.uid;
 
-    db.ref("users/" + uid).once("value", snap => {
-      if (!snap.exists()) {
-        let nama = prompt("Masukkan nama kamu ❤️");
-        if (!nama) nama = "Dede 💖";
-
-        db.ref("users/" + uid).set({
-          nama: nama
-        });
+    db.ref("users/"+uid).once("value",snap=>{
+      if(!snap.exists()){
+        let nama=prompt("Nama dede ❤️")||"Dede 💖";
+        db.ref("users/"+uid).set({nama:nama,bio:""});
       }
 
+      loadProfil(uid);
       tampilkanUser(uid);
     });
 
-    document.getElementById("loginBox").style.display = "none";
-    document.getElementById("main").style.display = "block";
+    loginBox.style.display="none";
+    main.style.display="block";
   }
 });
 
-// TAMPILKAN USER
-function tampilkanUser(uid) {
-  db.ref("users/" + uid).once("value", snap => {
-    let nama = snap.val().nama;
+// LOAD PROFIL
+function loadProfil(uid){
+  db.ref("users/"+uid).on("value",snap=>{
+    let d=snap.val();
+    namaProfil.value=d.nama;
+    bioProfil.value=d.bio||"";
+  });
+}
 
-    document.getElementById("welcomeText").innerHTML =
-      `Hai ${nama}... 💖<br>Kaka sayang sama dede selamanya 😊`;
+// SIMPAN PROFIL
+function simpanProfil(){
+  let user=auth.currentUser;
+  db.ref("users/"+user.uid).update({
+    nama:namaProfil.value,
+    bio:bioProfil.value
+  });
+  alert("Profil disimpan 💖");
+}
+
+// WELCOME
+function tampilkanUser(uid){
+  db.ref("users/"+uid).once("value",snap=>{
+    welcomeText.innerHTML=`Hai ${snap.val().nama} 💖`;
   });
 }
 
 // KOMENTAR
-function kirimKomentar() {
-  let user = auth.currentUser;
-  let komentar = document.getElementById("komentar").value;
+function kirimKomentar(){
+  let u=auth.currentUser;
+  if(!komentar.value)return;
 
-  if (!user) return alert("Login dulu ❤️");
-  if (!komentar) return alert("Tulis dulu ya ❤️");
-
-  let uid = user.uid;
-
-  db.ref("users/" + uid).once("value", snap => {
-    let nama = snap.val().nama;
-
+  db.ref("users/"+u.uid).once("value",snap=>{
     db.ref("komentar").push({
-      uid: uid,
-      nama: nama,
-      komentar: komentar
+      uid:u.uid,
+      nama:snap.val().nama,
+      komentar:komentar.value
     });
-
-    document.getElementById("komentar").value = "";
   });
+
+  komentar.value="";
 }
 
 // LOAD KOMENTAR
-db.ref("komentar").on("value", snapshot => {
-  let data = snapshot.val();
-  let html = "";
+db.ref("komentar").on("value",snap=>{
+  let data=snap.val();
+  let html="";
+  let user=auth.currentUser;
 
-  for (let id in data) {
-    html += `<p><b>${data[id].nama}</b>: ${data[id].komentar}</p>`;
+  for(let id in data){
+    let me=user && data[id].uid===user.uid;
+    html+=`<div class="bubble ${me?"me":"other"}">
+      <b>${data[id].nama}</b><br>${data[id].komentar}
+    </div>`;
   }
 
-  document.getElementById("listKomentar").innerHTML = html;
+  listKomentar.innerHTML=html;
 });
 
-// GAME
-let skor = 0;
-let waktu = 10;
-let gameAktif = false;
+// GAME + LEADERBOARD
+let skor=0,waktu=10,gameAktif=false;
 
-function mulaiGame() {
-  skor = 0;
-  waktu = 10;
-  gameAktif = true;
-
-  document.getElementById("score").innerText = skor;
-  document.getElementById("timer").innerText = waktu;
-
+function mulaiGame(){
+  skor=0; waktu=10; gameAktif=true;
+  score.innerText=skor; timer.innerText=waktu;
   spawnHati();
 
-  let countdown = setInterval(() => {
-    waktu--;
-    document.getElementById("timer").innerText = waktu;
-
-    if (waktu <= 0) {
-      clearInterval(countdown);
-      gameAktif = false;
-      alert("Skor kaka: " + skor);
-    }
-  }, 1000);
+  let c=setInterval(()=>{
+    waktu--; timer.innerText=waktu;
+    if(waktu<=0){clearInterval(c);gameAktif=false;alert("Skor: "+skor);}
+  },1000);
 }
 
-function spawnHati() {
-  if (!gameAktif) return;
-
-  let area = document.getElementById("areaGame");
-
-  let hati = document.createElement("div");
-  hati.innerHTML = "💖";
-
-  hati.style.position = "absolute";
-  hati.style.left = Math.random() * 90 + "%";
-  hati.style.top = Math.random() * 80 + "%";
-  hati.style.fontSize = "30px";
-
-  hati.onclick = function() {
-    skor++;
-    document.getElementById("score").innerText = skor;
-    hati.remove();
-  };
-
-  area.appendChild(hati);
-
-  setTimeout(() => {
-    hati.remove();
-    spawnHati();
-  }, 800);
+function spawnHati(){
+  if(!gameAktif)return;
+  let h=document.createElement("div");
+  h.innerHTML="💖";
+  h.style.position="absolute";
+  h.style.left=Math.random()*90+"%";
+  h.style.top=Math.random()*80+"%";
+  h.onclick=()=>{skor++;score.innerText=skor;h.remove();}
+  areaGame.appendChild(h);
+  setTimeout(()=>{h.remove();spawnHati();},800);
 }
 
-// LEADERBOARD
-function simpanSkor() {
-  let user = auth.currentUser;
-  if (!user) return alert("Login dulu ❤️");
-
-  let uid = user.uid;
-
-  db.ref("users/" + uid).once("value", snap => {
-    let nama = snap.val().nama;
-
-    db.ref("leaderboard/" + uid).set({
-      nama: nama,
-      skor: skor
+function simpanSkor(){
+  let u=auth.currentUser;
+  db.ref("users/"+u.uid).once("value",snap=>{
+    db.ref("leaderboard/"+u.uid).set({
+      nama:snap.val().nama,
+      skor:skor
     });
   });
 }
 
-// LOAD LEADERBOARD
-db.ref("leaderboard").on("value", snapshot => {
-  let data = snapshot.val();
-  let arr = [];
-
-  for (let id in data) {
-    arr.push(data[id]);
-  }
-
+db.ref("leaderboard").on("value",snap=>{
+  let d=snap.val(),arr=[];
+  for(let i in d)arr.push(d[i]);
   arr.sort((a,b)=>b.skor-a.skor);
 
-  let html = "";
-  arr.forEach((item,i)=>{
-    html += `<p>${i+1}. ❤️ ${item.nama} - ${item.skor}</p>`;
-  });
-
-  document.getElementById("leaderboard").innerHTML = html;
+  let html="";
+  arr.forEach((x,i)=>html+=`<p>${i+1}. ❤️ ${x.nama} - ${x.skor}</p>`);
+  leaderboard.innerHTML=html;
 });
 
 </script>
