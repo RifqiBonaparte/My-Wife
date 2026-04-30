@@ -7,9 +7,6 @@
 
 <style>
 
-
-
-
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -47,18 +44,23 @@ button {
   cursor: pointer;
 }
 
-/* CHAT */
+/* CHAT SCROLL */
 .chat {
   display: flex;
   flex-direction: column;
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 10px;
 }
 
+/* BUBBLE */
 .bubble {
   max-width: 70%;
   padding: 10px;
   margin: 5px;
   border-radius: 15px;
   text-align: left;
+  position: relative;
 }
 
 .me {
@@ -69,6 +71,12 @@ button {
 .other {
   background: rgba(255,255,255,0.5);
   color: #000;
+}
+
+/* ACTION BUTTON */
+.action {
+  font-size: 12px;
+  margin-top: 5px;
 }
 
 /* PROFILE */
@@ -99,19 +107,6 @@ button {
 
 <body>
 
-<!-- LOVE EFFECT -->
-<script>
-setInterval(() => {
-  let love = document.createElement("div");
-  love.innerHTML = "💖";
-  love.className = "love";
-  love.style.left = Math.random()*100 + "%";
-  love.style.animationDuration = (3 + Math.random()*3) + "s";
-  document.body.appendChild(love);
-  setTimeout(()=>love.remove(),5000);
-},500);
-</script>
-
 <!-- LOGIN -->
 <div id="loginBox" class="box">
   <h2>💖 Login Dulu Ya Dede 💖</h2>
@@ -133,8 +128,8 @@ setInterval(() => {
 <!-- PROFIL -->
 <div class="box profile-box">
   <h3>👤 Profil Dede</h3>
-  <input id="namaProfil" placeholder="Nama"><br>
-  <textarea id="bioProfil" placeholder="Tulis tentang dede..."></textarea><br>
+  <input id="namaProfil"><br>
+  <textarea id="bioProfil"></textarea><br>
   <button onclick="simpanProfil()">💾 Simpan Profil</button>
 </div>
 
@@ -143,36 +138,12 @@ setInterval(() => {
   <p id="welcomeText"></p>
 </div>
 
-<!-- MUSIK -->
-<audio id="music" loop>
-  <source src="Dahsyat.mp3" type="audio/mpeg">
-</audio>
-<button onclick="document.getElementById('music').play()">▶️ Putar Musik</button>
-
 <!-- KOMENTAR -->
 <div class="box">
   <h3>💬 Cerita Kita</h3>
-  <textarea id="komentar" placeholder="Tulis sesuatu untuk dede..."></textarea>
+  <textarea id="komentar"></textarea>
   <button onclick="kirimKomentar()">Kirim</button>
   <div id="listKomentar" class="chat"></div>
-</div>
-
-<!-- GAME -->
-<div class="box">
-  <h3>💗 Tangkap Hati Dede</h3>
-  <p>Waktu: <span id="timer">10</span></p>
-  <p>Skor: <span id="score">0</span></p>
-  <button onclick="mulaiGame()">Mulai Game</button>
-  <div id="areaGame" style="height:200px; position:relative;"></div>
-</div>
-
-<!-- LEADERBOARD -->
-<div class="box">
-  <h3>🏆 Leaderboard Cinta</h3>
-  <button onclick="simpanSkor()">Simpan Skor</button>
-  <div id="leaderboard"></div>
-</div>
-
 </div>
 
 <!-- FIREBASE -->
@@ -182,24 +153,24 @@ setInterval(() => {
 
 <script>
 
-const firebaseConfig = { apiKey: "AIzaSyCf_wZGW9TrOot5GBEW4EcIo5u7BY4g474", authDomain: "my-wife-one-only.firebaseapp.com", databaseURL: "https://my-wife-one-only-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "my-wife-one-only", storageBucket: "my-wife-one-only.firebasestorage.app", messagingSenderId: "520852731004", appId: "1:520852731004:web:96afc608002d47d83905f9" };
+const firebaseConfig = {
+  apiKey: "ISI",
+  authDomain: "ISI",
+  databaseURL: "ISI"
+};
 
 firebase.initializeApp(firebaseConfig);
 
 const db = firebase.database();
 const auth = firebase.auth();
 
-// DAFTAR
+// LOGIN
 function daftar(){
-  auth.createUserWithEmailAndPassword(email.value, passwordLogin.value)
-  .then(()=>alert("Berhasil daftar ❤️"))
-  .catch(err=>alert(err.message));
+  auth.createUserWithEmailAndPassword(email.value, passwordLogin.value);
 }
 
-// LOGIN
 function masuk(){
-  auth.signInWithEmailAndPassword(email.value, passwordLogin.value)
-  .catch(err=>alert(err.message));
+  auth.signInWithEmailAndPassword(email.value, passwordLogin.value);
 }
 
 // AUTO LOGIN
@@ -209,11 +180,8 @@ auth.onAuthStateChanged(user=>{
 
     db.ref("users/"+uid).once("value",snap=>{
       if(!snap.exists()){
-        let nama=prompt("Nama dede ❤️")||"Dede 💖";
-        db.ref("users/"+uid).set({nama:nama,bio:""});
+        db.ref("users/"+uid).set({nama:"Dede 💖"});
       }
-
-      loadProfil(uid);
       tampilkanUser(uid);
     });
 
@@ -222,36 +190,9 @@ auth.onAuthStateChanged(user=>{
   }
 });
 
-// LOAD PROFIL
-function loadProfil(uid){
-  db.ref("users/"+uid).on("value",snap=>{
-    let d=snap.val();
-    namaProfil.value=d.nama;
-    bioProfil.value=d.bio||"";
-  });
-}
-
-// SIMPAN PROFIL
-function simpanProfil(){
-  let user=auth.currentUser;
-  db.ref("users/"+user.uid).update({
-    nama:namaProfil.value,
-    bio:bioProfil.value
-  });
-  alert("Profil disimpan 💖");
-}
-
-// WELCOME
-function tampilkanUser(uid){
-  db.ref("users/"+uid).once("value",snap=>{
-    welcomeText.innerHTML=`Hai ${snap.val().nama} 💖`;
-  });
-}
-
 // KOMENTAR
 function kirimKomentar(){
   let u=auth.currentUser;
-  if(!komentar.value)return;
 
   db.ref("users/"+u.uid).once("value",snap=>{
     db.ref("komentar").push({
@@ -264,172 +205,69 @@ function kirimKomentar(){
   komentar.value="";
 }
 
-// LOAD KOMENTAR
+// LOAD KOMENTAR + EDIT + DELETE
 db.ref("komentar").on("value",snap=>{
   let data=snap.val();
   let html="";
   let user=auth.currentUser;
 
   for(let id in data){
-    let me=user && data[id].uid===user.uid;
-    html+=`<div class="bubble ${me?"me":"other"}">
-      <b>${data[id].nama}</b><br>${data[id].komentar}
+    let isMe = user && data[id].uid===user.uid;
+
+    html += `
+    <div class="bubble ${isMe?"me":"other"}">
+      <b>${data[id].nama}</b><br>
+      <span id="text-${id}">${data[id].komentar}</span>
+      ${isMe ? `
+        <div class="action">
+          <button onclick="editKomentar('${id}')">✏️</button>
+          <button onclick="hapusKomentar('${id}')">🗑️</button>
+        </div>
+      ` : ""}
     </div>`;
   }
 
   listKomentar.innerHTML=html;
 });
 
-// GAME + LEADERBOARD
-let skor=0,waktu=10,gameAktif=false;
-
-function mulaiGame(){
-  skor=0; waktu=10; gameAktif=true;
-  score.innerText=skor; timer.innerText=waktu;
-  spawnHati();
-
-  let c=setInterval(()=>{
-    waktu--; timer.innerText=waktu;
-    if(waktu<=0){clearInterval(c);gameAktif=false;alert("Skor: "+skor);}
-  },1000);
-}
-
-function spawnHati(){
-  if(!gameAktif)return;
-  let h=document.createElement("div");
-  h.innerHTML="💖";
-  h.style.position="absolute";
-  h.style.left=Math.random()*90+"%";
-  h.style.top=Math.random()*80+"%";
-  h.onclick=()=>{skor++;score.innerText=skor;h.remove();}
-  areaGame.appendChild(h);
-  setTimeout(()=>{h.remove();spawnHati();},800);
-}
-
-function simpanSkor(){
-  let u=auth.currentUser;
-  db.ref("users/"+u.uid).once("value",snap=>{
-    db.ref("leaderboard/"+u.uid).set({
-      nama:snap.val().nama,
-      skor:skor
+// EDIT
+function editKomentar(id){
+  let text = document.getElementById("text-"+id).innerText;
+  let baru = prompt("Edit pesan:", text);
+  if(baru){
+    db.ref("komentar/"+id).update({
+      komentar: baru
     });
-  });
-}
-
-db.ref("leaderboard").on("value",snap=>{
-  let d=snap.val(),arr=[];
-  for(let i in d)arr.push(d[i]);
-  arr.sort((a,b)=>b.skor-a.skor);
-
-  let html="";
-  arr.forEach((x,i)=>html+=`<p>${i+1}. ❤️ ${x.nama} - ${x.skor}</p>`);
-  leaderboard.innerHTML=html;
-});
-
-// =======================
-// 🎁 SURPRISE TANGGAL 9
-// =======================
-function cekSurprise() {
-  let today = new Date();
-  if (today.getDate() === 9) {
-    document.getElementById("surpriseBox").style.display = "flex";
-    efekLoveSpesial();
   }
 }
 
-function tutupSurprise() {
-  document.getElementById("surpriseBox").style.display = "none";
-}
-
-function efekLoveSpesial() {
-  for (let i = 0; i < 25; i++) {
-    let love = document.createElement("div");
-    love.innerHTML = "💖";
-    love.style.position = "fixed";
-    love.style.left = Math.random()*100 + "%";
-    love.style.top = Math.random()*100 + "%";
-    love.style.fontSize = "30px";
-    love.style.animation = "fall 3s linear";
-    document.body.appendChild(love);
-    setTimeout(()=>love.remove(),3000);
+// DELETE
+function hapusKomentar(id){
+  if(confirm("Hapus pesan?")){
+    db.ref("komentar/"+id).remove();
   }
 }
 
-// =======================
-// ⏳ COUNTDOWN KE TANGGAL 9
-// =======================
-function updateCountdown() {
-  let now = new Date();
-  let target = new Date();
-
-  // set ke tanggal 9 bulan ini
+// COUNTDOWN
+function updateCountdown(){
+  let now=new Date();
+  let target=new Date();
   target.setDate(9);
-  target.setHours(0,0,0,0);
 
-  // kalau sudah lewat → bulan depan
-  if (now.getDate() > 9) {
-    target.setMonth(target.getMonth() + 1);
+  if(now.getDate()>9){
+    target.setMonth(target.getMonth()+1);
   }
 
-  let diff = target - now;
+  let diff=target-now;
+  let d=Math.floor(diff/86400000);
 
-  let hari = Math.floor(diff / (1000*60*60*24));
-  let jam = Math.floor((diff / (1000*60*60)) % 24);
-  let menit = Math.floor((diff / (1000*60)) % 60);
-  let detik = Math.floor((diff / 1000) % 60);
-
-  document.getElementById("countdownText").innerHTML =
-    `💌 ${hari} hari ${jam} jam ${menit} menit ${detik} detik lagi 💖`;
+  countdownText.innerHTML = d+" hari lagi 💖";
 }
 
-// jalan terus
-setInterval(updateCountdown, 1000);
-
-// jalankan sekali saat load
+setInterval(updateCountdown,1000);
 updateCountdown();
-cekSurprise();
 
 </script>
-<!-- SURPRISE -->
-<div id="surpriseBox" style="
-display:none;
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.8);
-justify-content:center;
-align-items:center;
-z-index:999;
-">
 
-  <div style="
-  background:white;
-  color:black;
-  padding:20px;
-  border-radius:20px;
-  width:80%;
-  max-width:300px;
-  text-align:center;
-  animation: popup 0.5s;
-  ">
-    <h2>💖 Happy Monthly 💖</h2>
-    <p>
-      Hai dede... 💕<br>
-      Hari ini tanggal 9 😳<br>
-      Hari spesial kita 💖<br><br>
-      Kaka sayang sama dede selamanya 💕
-    </p>
-    <button onclick="tutupSurprise()">Tutup</button>
-  </div>
-</div>
-
-<style>
-@keyframes popup {
-  from {transform: scale(0);}
-  to {transform: scale(1);}
-}
-</style>
 </body>
 </html>
