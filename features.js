@@ -14,6 +14,13 @@
     reduceMotion: MW_PREFIX + "reduce_motion"
   };
 
+  function mwTodayISO() {
+    const date = new Date();
+    return date.getFullYear() + "-" +
+      String(date.getMonth() + 1).padStart(2, "0") + "-" +
+      String(date.getDate()).padStart(2, "0");
+  }
+
   function mwRead(key, fallback) {
     try {
       const value = localStorage.getItem(key);
@@ -141,7 +148,7 @@
       { value: "lelah", emoji: "😴", label: "Lelah" },
       { value: "sedih", emoji: "🌧️", label: "Sedih" }
     ];
-    const mwMoodToday = new Date().toLocaleDateString("en-CA");
+    const mwMoodToday = mwTodayISO();
     let mwMoodHistory = mwRead(MW_KEYS.mood, []);
     if (!Array.isArray(mwMoodHistory)) mwMoodHistory = [];
 
@@ -299,7 +306,7 @@
     const mwMemoryDate = document.createElement("input");
     mwMemoryDate.type = "date";
     mwMemoryDate.required = true;
-    mwMemoryDate.value = new Date().toLocaleDateString("en-CA");
+    mwMemoryDate.value = mwTodayISO();
     mwMemoryDate.setAttribute("aria-label", "Tanggal kenangan");
     const mwMemoryTitle = document.createElement("input");
     mwMemoryTitle.type = "text";
@@ -484,6 +491,19 @@
     mwSettingsCard.append(mwThemeRow, mwFontRow, mwMotionRow, mwBackupButtons);
 
     mwMain.append(mwMoodCard, mwDiaryCard, mwBucketCard, mwMemoryCard, mwCounterCard, mwSettingsCard);
+
+    [
+      { id: "mwMoodJournal", label: "🌈 Mood" },
+      { id: "mwDiary", label: "📔 Diary" },
+      { id: "mwBucketList", label: "📝 Rencana" },
+      { id: "mwMemoryTimeline", label: "🗓️ Kenangan" },
+      { id: "mwTogetherCounter", label: "💞 Hitung hari" },
+      { id: "mwSettings", label: "⚙️ Pengaturan" }
+    ].forEach(function (section) {
+      const link = mwMake("a", "mw-nav-link", section.label);
+      link.href = "#" + section.id;
+      mwNavLinks.appendChild(link);
+    });
 
     // Terapkan preferensi yang tersimpan.
     if (mwRead(MW_KEYS.light, false)) {
