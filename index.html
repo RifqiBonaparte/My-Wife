@@ -227,114 +227,166 @@ auth.onAuthStateChanged(user=>{
 // LOAD PROFIL
 function loadProfil(uid){
   db.ref("users/"+uid).on("value",snap=>{
-    let d=snap.val();
-    namaProfil.value=d.nama;
-    bioProfil.value=d.bio||"";
+    let d=snap.val() || {};
+    namaProfil.value=d.nama || "";
+    bioProfil.value=d.bio || "";
   });
 }
 
 // SIMPAN PROFIL
 function simpanProfil(){
   let user=auth.currentUser;
+  if(!user){alert("Silakan masuk lagi.");return;}
+  const nama=namaProfil.value.trim().slice(0,80);
+  if(!nama){alert("Nama tidak boleh kosong.");return;}
   db.ref("users/"+user.uid).update({
-    nama:namaProfil.value,
-    bio:bioProfil.value
-  });
-  alert("Profil disimpan 💖");
+    nama:nama,
+    bio:bioProfil.value.trim().slice(0,500)
+  }).then(()=>alert("Profil disimpan 💖"))
+    .catch(()=>alert("Profil belum bisa disimpan. Periksa koneksi Firebase."));
 }
 
 // WELCOME
 function tampilkanUser(uid){
   db.ref("users/"+uid).once("value",snap=>{
-    welcomeText.innerHTML=`Hai ${snap.val().nama} 💖`;
+    const data=snap.val() || {};
+    welcomeText.textContent="Hai "+(data.nama || "Dede")+" 💖";
   });
 }
 
 // KOMENTAR
 function kirimKomentar(){
   let u=auth.currentUser;
-  if(!komentar.value)return;
+  const isi=komentar.value.trim().slice(0,1000);
+  if(!u){alert("Silakan masuk lagi.");return;}
+  if(!isi){alert("Tulis pesan terlebih dahulu.");return;}
 
-  db.ref("users/"+u.uid).once("value",snap=>{
-    db.ref("komentar").push({
+  db.ref("users/"+u.uid).once("value").then(snap=>{
+    const data=snap.val() || {};
+    return db.ref("komentar").push({
       uid:u.uid,
-      nama:snap.val().nama,
-      komentar:komentar.value
+      nama:data.nama || "Dede",
+      komentar:isi
     });
+  }).then(()=>{
+    komentar.value="";
+  }).catch(()=>{
+    alert("Komentar belum bisa dikirim. Periksa koneksi Firebase.");
   });
-
-  komentar.value="";
 }
 
-// LOAD KOMENTAR
+// LOAD KOMENTAR — tampilkan sebagai teks agar input pengguna tidak dianggap HTML.
 db.ref("komentar").on("value",snap=>{
-  let data=snap.val();
-  let html="";
-  let user=auth.currentUser;
+  const data=snap.val() || {};
+  const daftar=document.getElementById("listKomentar");
+  if(!daftar)return;
+  daftar.replaceChildren();
+  const user=auth.currentUser;
 
-  for(let id in data){
-    let me=user && data[id].uid===user.uid;
-    html+=`<div class="bubble ${me?"me":"other"}">
-      <b>${data[id].nama}</b><br>${data[id].komentar}
-    </div>`;
-  }
-
-  listKomentar.innerHTML=html;
+  Object.keys(data).forEach(id=>{
+    const item=data[id] || {};
+    const bubble=document.createElement("div");
+    bubble.className="bubble "+(user && item.uid===user.uid ? "me" : "other");
+    const nama=document.createElement("b");
+    nama.textContent=item.nama || "Anonim";
+    bubble.appendChild(nama);
+    bubble.appendChild(document.createElement("br"));
+    bubble.appendChild(document.createTextNode(item.komentar || ""));
+    daftar.appendChild(bubble);
+  });
 });
 
 // GAME + LEADERBOARD
 let skor=0,waktu=10,gameAktif=false;
+let mwGameInterval=null,mwGameGeneration=0;
 
 function mulaiGame(){
+  if(mwGameInterval){clearInterval(mwGameInterval);mwGameInterval=null;}
+  mwGameGeneration++;
+  const sesi=mwGameGeneration;
+  const area=document.getElementById("areaGame");
+  if(area)area.replaceChildren();
   skor=0; waktu=10; gameAktif=true;
   score.innerText=skor; timer.innerText=waktu;
-  spawnHati();
+  spawnHati(sesi);
 
-  let c=setInterval(()=>{
+  mwGameInterval=setInterval(()=>{
+    if(sesi!==mwGameGeneration){clearInterval(mwGameInterval);mwGameInterval=null;return;}
     waktu--; timer.innerText=waktu;
-    if(waktu<=0){clearInterval(c);gameAktif=false;alert("Skor: "+skor);}
+    if(waktu<=0){
+      clearInterval(mwGameInterval);
+      mwGameInterval=null;
+      gameAktif=false;
+      mwGameGeneration++;
+      alert("Skor: "+skor);
+    }
   },1000);
 }
 
-function spawnHati(){
-  if(!gameAktif)return;
-  let h=document.createElement("div");
-  h.innerHTML="💖";
+function spawnHati(sesi){
+  if(!gameAktif || sesi!==mwGameGeneration)return;
+  const area=document.getElementById("areaGame");
+  if(!area)return;
+  const h=document.createElement("button");
+  h.type="button";
+  h.className="mw-game-heart";
+  h.textContent="💖";
+  h.setAttribute("aria-label","Tangkap hati");
   h.style.position="absolute";
   h.style.left=Math.random()*90+"%";
   h.style.top=Math.random()*80+"%";
-  h.onclick=()=>{skor++;score.innerText=skor;h.remove();}
-  areaGame.appendChild(h);
-  setTimeout(()=>{h.remove();spawnHati();},800);
+  h.addEventListener("click",()=>{
+    if(!gameAktif || sesi!==mwGameGeneration)return;
+    skor++;
+    score.innerText=skor;
+    h.remove();
+  });
+  area.appendChild(h);
+  setTimeout(()=>{
+    h.remove();
+    if(sesi===mwGameGeneration)spawnHati(sesi);
+  },800);
 }
 
 function simpanSkor(){
   let u=auth.currentUser;
-  db.ref("users/"+u.uid).once("value",snap=>{
-    db.ref("leaderboard/"+u.uid).set({
-      nama:snap.val().nama,
-      skor:skor
+  if(!u){alert("Silakan masuk lagi.");return;}
+  db.ref("users/"+u.uid).once("value").then(snap=>{
+    const data=snap.val() || {};
+    return db.ref("leaderboard/"+u.uid).set({
+      nama:data.nama || "Dede",
+      skor:Number(skor) || 0
     });
-  });
+  }).then(()=>alert("Skor berhasil disimpan 🏆"))
+    .catch(()=>alert("Skor belum bisa disimpan. Periksa koneksi Firebase."));
 }
 
 db.ref("leaderboard").on("value",snap=>{
-  let d=snap.val(),arr=[];
-  for(let i in d)arr.push(d[i]);
-  arr.sort((a,b)=>b.skor-a.skor);
-
-  let html="";
-  arr.forEach((x,i)=>html+=`<p>${i+1}. ❤️ ${x.nama} - ${x.skor}</p>`);
-  leaderboard.innerHTML=html;
+  const data=snap.val() || {};
+  const daftar=[];
+  Object.keys(data).forEach(id=>{
+    const item=data[id] || {};
+    daftar.push({nama:item.nama || "Dede",skor:Number(item.skor) || 0});
+  });
+  daftar.sort((a,b)=>b.skor-a.skor);
+  const wadah=document.getElementById("leaderboard");
+  if(!wadah)return;
+  wadah.replaceChildren();
+  daftar.forEach((item,index)=>{
+    const baris=document.createElement("p");
+    baris.textContent=(index+1)+". ❤️ "+item.nama+" - "+item.skor;
+    wadah.appendChild(baris);
+  });
 });
 
 // =======================
 // 🎁 SURPRISE TANGGAL 9
 // =======================
 function cekSurprise() {
-  let today = new Date();
-  if (today.getDate() === 9) {
-    document.getElementById("surpriseBox").style.display = "flex";
+  const today = new Date();
+  const surprise=document.getElementById("surpriseBox");
+  if (today.getDate() === 9 && surprise) {
+    surprise.style.display = "flex";
     efekLoveSpesial();
   }
 }
@@ -389,7 +441,7 @@ setInterval(updateCountdown, 1000);
 
 // jalankan sekali saat load
 updateCountdown();
-cekSurprise();
+document.addEventListener("DOMContentLoaded", cekSurprise);
 
 </script>
 <!-- SURPRISE -->
