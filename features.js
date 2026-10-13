@@ -87,9 +87,12 @@
       const mwMatch = mwSections.find(function (section) {
         return section.match.test(mwHeadingText);
       });
+      // Pertahankan ID yang dipakai kontrol musik dan pesan tambahan.
       if (mwMatch) {
-        mwBox.id = mwMatch.id;
-      } else if (!mwBox.id || mwBox.id === "mwLoveNote") {
+        if (mwBox.id !== "mwMusicPanel" && mwBox.id !== "mwLoveNote") {
+          mwBox.id = mwMatch.id;
+        }
+      } else if (!mwBox.id) {
         mwBox.id = "mw-section-extra-" + index;
       }
     });
