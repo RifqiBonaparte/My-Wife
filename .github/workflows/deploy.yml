@@ -28,6 +28,7 @@ jobs:
           node --check script.js
           node --check enhancements.js
           node --check features.js
+          node --check redesign.js
           node <<'NODE'
           const fs = require('node:fs');
           const vm = require('node:vm');
@@ -46,6 +47,8 @@ jobs:
           }
           if (!html.includes('href="features.css"')) throw new Error('features.css is not linked from index.html');
           if (!html.includes('src="features.js"')) throw new Error('features.js is not linked from index.html');
+          if (!html.includes('href="redesign.css"')) throw new Error('redesign.css is not linked from index.html');
+          if (!html.includes('src="redesign.js"')) throw new Error('redesign.js is not linked from index.html');
           console.log('Validated ' + inlineCount + ' inline scripts and local asset references.');
           NODE
 
