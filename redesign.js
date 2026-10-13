@@ -54,6 +54,12 @@
     if (legacyNav) legacyNav.remove();
 
     const originalNodes = Array.from(main.children);
+    if (!document.querySelector(".mw-stars")) {
+      const stars = document.createElement("div");
+      stars.className = "mw-stars";
+      stars.setAttribute("aria-hidden", "true");
+      document.body.prepend(stars);
+    }
     const shell = document.createElement("div");
     shell.className = "mw-app-shell";
     const sidebar = document.createElement("aside");
