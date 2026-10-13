@@ -165,6 +165,56 @@
       nav.appendChild(button);
     });
 
+    // Beranda dibuat sebagai dashboard sungguhan, bukan sekadar kumpulan kartu.
+    const homeHero = document.createElement("section");
+    homeHero.className = "mw-home-hero";
+    homeHero.setAttribute("aria-label", "Sambutan");
+    const heroCopy = document.createElement("div");
+    heroCopy.className = "mw-home-hero-copy";
+    const heroTag = document.createElement("span");
+    heroTag.className = "mw-hero-tag";
+    heroTag.textContent = "A LITTLE SPACE, JUST FOR US";
+    const heroTitle = document.createElement("h2");
+    heroTitle.append("Hal-hal kecil, ", document.createElement("br"), "cerita yang berarti.");
+    const heroDescription = document.createElement("p");
+    heroDescription.textContent = "Simpan momen, putar lagu, tulis cerita, dan luangkan waktu untuk hal-hal yang bikin hari terasa lebih hangat.";
+    const heroActions = document.createElement("div");
+    heroActions.className = "mw-hero-actions";
+    [
+      { label: "Tulis cerita", icon: "↗", page: "stories", primary: true },
+      { label: "Putar musik", icon: "♫", page: "music", primary: false },
+      { label: "Main sebentar", icon: "✳", page: "play", primary: false }
+    ].forEach(function (item) {
+      const action = document.createElement("button");
+      action.type = "button";
+      action.className = "mw-hero-action" + (item.primary ? " mw-hero-action-primary" : "");
+      const actionLabel = document.createElement("span");
+      actionLabel.textContent = item.label;
+      const actionIcon = document.createElement("span");
+      actionIcon.setAttribute("aria-hidden", "true");
+      actionIcon.textContent = item.icon;
+      action.append(actionLabel, actionIcon);
+      action.addEventListener("click", function () { mwShowPage(item.page); });
+      heroActions.appendChild(action);
+    });
+    heroCopy.append(heroTag, heroTitle, heroDescription, heroActions);
+    const heroArt = document.createElement("div");
+    heroArt.className = "mw-hero-art";
+    heroArt.setAttribute("aria-hidden", "true");
+    const heroOrbit = document.createElement("div");
+    heroOrbit.className = "mw-hero-orbit";
+    const heroOrb = document.createElement("div");
+    heroOrb.className = "mw-hero-orb";
+    const heroSpark = document.createElement("span");
+    heroSpark.className = "mw-hero-spark";
+    heroSpark.textContent = "✦";
+    const heroHeart = document.createElement("span");
+    heroHeart.className = "mw-hero-heart";
+    heroHeart.textContent = "♡";
+    heroArt.append(heroOrbit, heroOrb, heroSpark, heroHeart);
+    homeHero.append(heroCopy, heroArt);
+    pageMap.overview.panel.insertBefore(homeHero, pageMap.overview.grid);
+
     const footer = document.createElement("footer");
     footer.className = "mw-page-footer";
     const footerText = document.createElement("span");
