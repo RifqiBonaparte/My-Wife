@@ -32,15 +32,15 @@ jobs:
           const fs = require('node:fs');
           const vm = require('node:vm');
           const html = fs.readFileSync('index.html', 'utf8');
-          const scriptBlocks = [...html.matchAll(/<script\\b([^>]*)>([\\s\\S]*?)<\\/script>/gi)];
+          const scriptBlocks = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)];
           let inlineCount = 0;
           for (const [, attributes, source] of scriptBlocks) {
-            if (/\\bsrc\\s*=/.test(attributes) || !source.trim()) continue;
+            if (/\bsrc\s*=/.test(attributes) || !source.trim()) continue;
             new vm.Script(source, { filename: 'index-inline-' + (++inlineCount) + '.js' });
           }
-          const refs = [...html.matchAll(/(?:src|href)=[\\"']([^\\"']+)[\\"']/gi)].map(match => match[1]);
+          const refs = [...html.matchAll(/(?:src|href)=[\"']([^\"']+)[\"']/gi)].map(match => match[1]);
           for (const ref of refs) {
-            if (/^(?:https?:)?\\/\\//i.test(ref) || ref.startsWith('#') || ref.startsWith('data:')) continue;
+            if (/^(?:https?:)?\/\//i.test(ref) || ref.startsWith('#') || ref.startsWith('data:')) continue;
             const path = ref.split(/[?#]/)[0];
             if (path && !fs.existsSync(path)) throw new Error('Missing local asset: ' + path);
           }
