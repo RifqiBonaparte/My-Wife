@@ -1,0 +1,209 @@
+/* Tambahan tampilan untuk My-Wife — tidak menggantikan CSS lama */
+:root {
+  color-scheme: dark;
+  --mw-pink: #ff5f9e;
+  --mw-purple: #9b7bff;
+  --mw-glass: rgba(28, 18, 49, 0.62);
+  --mw-border: rgba(255, 255, 255, 0.17);
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: linear-gradient(125deg, #100d25, #351634, #17254a, #421d3b);
+  background-size: 300% 300%;
+  animation: mwNightGlow 22s ease-in-out infinite;
+  color: #fff7fc;
+}
+
+@keyframes mwNightGlow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+body::before {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255, 105, 180, .18), transparent 32%),
+    radial-gradient(circle at 82% 25%, rgba(132, 112, 255, .18), transparent 30%),
+    radial-gradient(circle at 50% 90%, rgba(255, 160, 190, .12), transparent 35%);
+}
+
+body::after {
+  opacity: .45;
+  background-image:
+    radial-gradient(2px 2px at 12% 22%, #fff 50%, transparent 100%),
+    radial-gradient(1px 1px at 35% 72%, #fff 50%, transparent 100%),
+    radial-gradient(2px 2px at 68% 18%, #fff 50%, transparent 100%),
+    radial-gradient(1px 1px at 82% 63%, #fff 50%, transparent 100%),
+    radial-gradient(2px 2px at 92% 42%, #fff 50%, transparent 100%),
+    radial-gradient(1px 1px at 55% 38%, #fff 50%, transparent 100%);
+  background-size: 340px 260px;
+  animation: mwStarDrift 50s linear infinite;
+}
+
+@keyframes mwStarDrift {
+  from { transform: translateY(0); }
+  to { transform: translateY(-260px); }
+}
+
+.box {
+  max-width: 760px;
+  margin: 22px auto;
+  padding: 22px;
+  background: var(--mw-glass);
+  border: 1px solid var(--mw-border);
+  border-radius: 22px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, .18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+}
+
+.box:hover {
+  border-color: rgba(255, 159, 205, .35);
+  box-shadow: 0 16px 42px rgba(0, 0, 0, .23);
+}
+
+h2, h3 {
+  text-shadow: 0 2px 18px rgba(255, 95, 158, .22);
+}
+
+input, textarea {
+  box-sizing: border-box;
+  max-width: 100%;
+  background: rgba(255, 255, 255, .94);
+  color: #27172d;
+  outline: 2px solid transparent;
+  transition: outline-color .2s ease, box-shadow .2s ease;
+}
+
+input:focus, textarea:focus {
+  outline-color: #ff8bb9;
+  box-shadow: 0 0 0 4px rgba(255, 95, 158, .15);
+}
+
+button {
+  width: auto;
+  min-height: 42px;
+  padding: 11px 17px;
+  background: linear-gradient(135deg, #ff4d87, #b45cff);
+  border: 1px solid rgba(255, 255, 255, .18);
+  box-shadow: 0 5px 16px rgba(180, 92, 255, .16);
+  transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
+}
+
+button:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 77, 135, .25);
+}
+
+button:active { transform: translateY(0) scale(.98); }
+button:focus-visible { outline: 2px solid white; outline-offset: 3px; }
+
+.bubble {
+  border: 1px solid rgba(255, 255, 255, .12);
+  overflow-wrap: anywhere;
+}
+
+.me {
+  background: linear-gradient(135deg, #ff4d87, #b44bca);
+  color: white;
+}
+
+.other {
+  background: rgba(255, 255, 255, .88);
+  color: #24152b;
+}
+
+#areaGame {
+  overflow: hidden;
+  border: 1px dashed rgba(255, 255, 255, .25);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .035);
+}
+
+#areaGame > div {
+  cursor: pointer;
+  user-select: none;
+  font-size: 25px;
+  filter: drop-shadow(0 0 8px rgba(255, 100, 170, .5));
+}
+
+#mwMusicPanel {
+  width: min(92%, 720px);
+  box-sizing: border-box;
+  margin: 10px auto 24px;
+  padding: 16px;
+  border: 1px solid var(--mw-border);
+  border-radius: 20px;
+  background: rgba(22, 15, 39, .76);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
+  backdrop-filter: blur(12px);
+}
+
+#mwMusicPanel .mw-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#mwMusicPanel button { margin: 2px; }
+
+#mwMusicPanel input[type="range"] {
+  width: min(220px, 90%);
+  accent-color: #ff70ad;
+  vertical-align: middle;
+}
+
+#mwMusicProgress {
+  width: 100%;
+  accent-color: #ff70ad;
+}
+
+#mwMusicStatus {
+  min-height: 1.3em;
+  color: #ffd6e8;
+  font-size: .9rem;
+}
+
+#mwLoveNote {
+  max-width: 760px;
+  margin: 18px auto;
+}
+
+#mwLoveNoteText {
+  min-height: 2.5em;
+  line-height: 1.7;
+}
+
+#surpriseBox > div {
+  box-shadow: 0 20px 70px rgba(255, 95, 158, .25);
+}
+
+@media (max-width: 600px) {
+  .box { margin: 12px; padding: 17px; }
+  input, textarea { width: 100%; }
+  .profile-box input, .profile-box textarea { width: 100%; }
+  #mwMusicPanel { width: calc(100% - 24px); }
+  button { max-width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body, body::after { animation: none; }
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
