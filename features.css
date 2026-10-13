@@ -149,6 +149,40 @@ body.mw-light-theme .mw-mood-button { color: #38243d; background: rgba(120, 75, 
 body.mw-light-theme .mw-secondary-button, body.mw-light-theme .mw-icon-button { color: #38243d; background: rgba(120, 75, 140, .1) !important; border-color: rgba(110, 61, 120, .18) !important; }
 body.mw-light-theme .mw-memory-date { color: #b32668; }
 
+/* Perluas tema terang ke bagian lama tanpa mengganti struktur HTML. */
+body.mw-light-theme .box:not(#loginBox),
+body.mw-light-theme #mwMusicPanel {
+  background: rgba(255, 255, 255, .88) !important;
+  color: #38243d !important;
+  border-color: rgba(110, 61, 120, .18) !important;
+}
+body.mw-light-theme .box:not(#loginBox) p,
+body.mw-light-theme #mwMusicPanel p,
+body.mw-light-theme .box:not(#loginBox) label {
+  color: #51405a;
+}
+body.mw-light-theme .bubble.other {
+  background: #f0e8f6;
+  color: #38243d;
+}
+body.mw-light-theme .bubble.me {
+  color: #fff;
+}
+.mw-game-heart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px !important;
+  min-width: 42px;
+  height: 42px;
+  min-height: 42px;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  font-size: 1.25rem;
+  border-radius: 50%;
+}
+
 /* Preferensi aksesibilitas */
 body.mw-reduced-motion *, body.mw-reduced-motion *::before, body.mw-reduced-motion *::after {
   animation-duration: .01ms !important;
