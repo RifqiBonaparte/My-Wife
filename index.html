@@ -97,22 +97,12 @@ button {
 </style>
 <link rel="stylesheet" href="enhancements.css">
 <link rel="stylesheet" href="features.css">
+<link rel="stylesheet" href="redesign.css">
 </head>
 
 <body>
 
-<!-- LOVE EFFECT -->
-<script>
-setInterval(() => {
-  let love = document.createElement("div");
-  love.innerHTML = "💖";
-  love.className = "love";
-  love.style.left = Math.random()*100 + "%";
-  love.style.animationDuration = (3 + Math.random()*3) + "s";
-  document.body.appendChild(love);
-  setTimeout(()=>love.remove(),5000);
-},500);
-</script>
+<!-- Background animasi baru memakai aurora dan bintang halus, tanpa emoji jatuh. -->
 
 <!-- LOGIN -->
 <div id="loginBox" class="box">
@@ -396,17 +386,9 @@ function tutupSurprise() {
 }
 
 function efekLoveSpesial() {
-  for (let i = 0; i < 25; i++) {
-    let love = document.createElement("div");
-    love.innerHTML = "💖";
-    love.style.position = "fixed";
-    love.style.left = Math.random()*100 + "%";
-    love.style.top = Math.random()*100 + "%";
-    love.style.fontSize = "30px";
-    love.style.animation = "fall 3s linear";
-    document.body.appendChild(love);
-    setTimeout(()=>love.remove(),3000);
-  }
+  // Efek perayaan sederhana tanpa hujan emoji yang mengganggu.
+  const surprise = document.getElementById("surpriseBox");
+  if (surprise) surprise.classList.add("mw-surprise-open");
 }
 
 // =======================
@@ -487,5 +469,6 @@ z-index:999;
 </style>
 <script src="enhancements.js"></script>
 <script src="features.js"></script>
+<script src="redesign.js"></script>
 </body>
 </html>                                        
